@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  image_moderation_frontend:
+    image: image_moderation_frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - image_moderation_backend
+    networks:
+      - image_moderation_network
+  image_moderation_backend:
+    image: image_moderation_backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "7000:7000"
+    depends_on:
+      - image_moderation_mongo
+    environment:
+      - MONGO_URI=mongodb://image_moderation_mongo:27017
+    networks:
+      - image_moderation_network
+  image_moderation_mongo:
+    image: mongo:8.0.9
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - image_moderation_network
+networks:
+  image_moderation_network:
+    driver: bridge
+volumes:
+  mongo_data:
